@@ -131,14 +131,22 @@ body {
 .server {
     background: #161b22;
     border: 2px solid;
-    padding: 15px 25px;
+    padding: 15px;
     border-radius: 5px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
     font-weight: bold;
     text-align: center;
-    min-width: 100px;
+    min-width: 180px;
+    line-height: 1.4;
 }
+
+.server small {
+    font-size: 10px;
+    color: #8b949e;
+    font-weight: normal;
+}
+
 
 .server.dpi { border-color: #8957e5; box-shadow: 0 5px 15px rgba(137, 87, 229, 0.2); }
 .server.mirror { border-color: #d29922; box-shadow: 0 5px 15px rgba(210, 153, 34, 0.2); }

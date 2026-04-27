@@ -11,7 +11,19 @@
 </head>
 <body>
     <div id="diagram-container">
-        <svg id="connections" preserveAspectRatio="none"></svg>
+        <svg id="connections" preserveAspectRatio="none">
+            <defs>
+                <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orientation="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#58a6ff" />
+                </marker>
+                <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orientation="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#3fb950" />
+                </marker>
+                <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orientation="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#d29922" />
+                </marker>
+            </defs>
+        </svg>
 
         <div class="top-clouds">
             <div class="cloud" id="cloud-in">Cybernet Network IN</div>
@@ -33,6 +45,7 @@
                         <div class="port" id="ex0-11">0/11</div>
                         <div class="port" id="ex0-13">0/13</div>
                         <div class="port" id="ex0-15">0/15</div>
+                        
                         <div class="port" id="ex0-2">0/2</div>
                         <div class="port" id="ex0-4">0/4</div>
                         <div class="port" id="ex0-6">0/6</div>
@@ -56,6 +69,7 @@
                         <div class="port" id="ex2-11">2/11</div>
                         <div class="port" id="ex2-13">2/13</div>
                         <div class="port" id="ex2-15">2/15</div>
+                        
                         <div class="port" id="ex2-2">2/2</div>
                         <div class="port" id="ex2-4">2/4</div>
                         <div class="port" id="ex2-6">2/6</div>
@@ -70,42 +84,34 @@
         </div>
 
         <div class="servers-layer dpi-layer">
-            <div class="layer-title">Inline DPI Servers</div>
+            <div class="layer-title">Inline DPI Servers (2 Flow Sets / DPI)</div>
             <div class="server-group">
-                <div class="server dpi" id="dpi-1">DPI-1</div>
-                <div class="server dpi" id="dpi-2">DPI-2</div>
-                <div class="server dpi" id="dpi-3">DPI-3</div>
-                <div class="server dpi" id="dpi-4">DPI-4</div>
-                <div class="server dpi" id="dpi-5">DPI-5</div>
-                <div class="server dpi" id="dpi-6">DPI-6</div>
-                <div class="server dpi" id="dpi-7">DPI-7</div>
-                <div class="server dpi" id="dpi-8">DPI-8</div>
+                <div class="server dpi" id="dpi-1">DPI-1<br><small>(Flow Set 1 & 2)</small></div>
+                <div class="server dpi" id="dpi-2">DPI-2<br><small>(Flow Set 3 & 4)</small></div>
+                <div class="server dpi" id="dpi-3">DPI-3<br><small>(Flow Set 5 & 6)</small></div>
+                <div class="server dpi" id="dpi-4">DPI-4<br><small>(Flow Set 7 & 8)</small></div>
             </div>
         </div>
 
         <div class="servers-layer mirror-layer">
             <div class="layer-title">Lawful Intercept / Mirror Servers</div>
             <div class="server-group">
-                <div class="server mirror" id="m-dpi-1">M-DPI-1</div>
-                <div class="server mirror" id="m-dpi-2">M-DPI-2</div>
-                <div class="server mirror" id="m-dpi-3">M-DPI-3</div>
-                <div class="server mirror" id="m-dpi-4">M-DPI-4</div>
-                <div class="server mirror" id="m-dpi-5">M-DPI-5</div>
-                <div class="server mirror" id="m-dpi-6">M-DPI-6</div>
-                <div class="server mirror" id="m-dpi-7">M-DPI-7</div>
-                <div class="server mirror" id="m-dpi-8">M-DPI-8</div>
+                <div class="server mirror" id="m-dpi-1">M-DPI-1<br><small>(Flow Set 1 & 2 Clones)</small></div>
+                <div class="server mirror" id="m-dpi-2">M-DPI-2<br><small>(Flow Set 3 & 4 Clones)</small></div>
+                <div class="server mirror" id="m-dpi-3">M-DPI-3<br><small>(Flow Set 5 & 6 Clones)</small></div>
+                <div class="server mirror" id="m-dpi-4">M-DPI-4<br><small>(Flow Set 7 & 8 Clones)</small></div>
             </div>
         </div>
     </div>
     
     <div class="legend" id="legend">
-        <h3>Routing Legend</h3>
-        <div class="leg-item"><div class="line blue" style="border-top-style: solid;"></div> Ex0 Physical Uplink</div>
-        <div class="leg-item"><div class="line blue" style="border-top-style: dotted;"></div> Ex0 Inner Logical Switch</div>
-        <div class="leg-item"><div class="line blue" style="border-top-style: dashed;"></div> Ex0 Physical Return</div>
-        <div class="leg-item"><div class="line green" style="border-top-style: solid;"></div> Ex2 Physical Uplink</div>
-        <div class="leg-item"><div class="line green" style="border-top-style: dotted;"></div> Ex2 Inner Logical Switch</div>
-        <div class="leg-item"><div class="line green" style="border-top-style: dashed;"></div> Ex2 Physical Return</div>
+        <h3>Routing Legend (Arrow points Direction)</h3>
+        <div class="leg-item"><div class="line blue" style="border-top-style: solid;"></div> Ex0 Physical Uplink (Inward)</div>
+        <div class="leg-item"><div class="line blue" style="border-top-style: dotted;"></div> Ex0 Inner Logical FWD</div>
+        <div class="leg-item"><div class="line blue" style="border-top-style: dashed;"></div> Ex0 Physical Return (Outward)</div>
+        <div class="leg-item"><div class="line green" style="border-top-style: solid;"></div> Ex2 Physical Uplink (Inward)</div>
+        <div class="leg-item"><div class="line green" style="border-top-style: dotted;"></div> Ex2 Inner Logical FWD</div>
+        <div class="leg-item"><div class="line green" style="border-top-style: dashed;"></div> Ex2 Physical Return (Outward)</div>
         <div class="leg-item"><div class="line orange" style="border-top-style: dashed;"></div> Mirror Clone Data</div>
     </div>
 

@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const svg = document.getElementById('connections');
     
-    // Updates viewBox to match container size
     function resizeSVG() {
         const container = document.getElementById('diagram-container');
         svg.setAttribute('width', container.offsetWidth);
@@ -12,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     resizeSVG();
     window.addEventListener('resize', () => { resizeSVG(); drawAllFlows(); });
 
-    // Center coordinates of an element relative to the container
     function getCenter(id) {
         const el = document.getElementById(id);
         const container = document.getElementById('diagram-container');
@@ -27,13 +25,21 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    // Helper to create an SVG path (Bezier Curve)
     function createPath(startX, startY, endX, endY, classes, color, cp1yOffset, cp2yOffset) {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const d = `M ${startX} ${startY} C ${startX} ${startY + cp1yOffset}, ${endX} ${endY + cp2yOffset}, ${endX} ${endY}`;
         path.setAttribute('d', d);
         path.setAttribute('class', classes);
         path.setAttribute('stroke', color);
+        
+        // Add directional arrows
+        let markerId = '';
+        if(color === '#58a6ff') markerId = 'url(#arrow-blue)';
+        if(color === '#3fb950') markerId = 'url(#arrow-green)';
+        if(color === '#d29922') markerId = 'url(#arrow-orange)';
+        
+        path.setAttribute('marker-end', markerId);
+        
         svg.appendChild(path);
     }
 
@@ -43,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if(p1.x === 0 || p2.x === 0) return;
 
-        // Apply slight visual offsets so overlapping lines don't completely hide each other
         p1.x += offset;
         p2.x += offset;
 
@@ -53,11 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (curveType === 'up') {
             cp1Offset = -100; cp2Offset = 100;
         } else if (curveType === 'inner') {
-            cp1Offset = -30; cp2Offset = -30;
+            cp1Offset = -25; cp2Offset = -25;
         } else if (curveType === 'inner-down') {
-            cp1Offset = 30; cp2Offset = 30;
+            cp1Offset = 25; cp2Offset = 25;
         } else if (curveType === 'deep') {
-            cp1Offset = 250; cp2Offset = -250;
+            cp1Offset = 200; cp2Offset = -200;
         } else {
             cp1Offset = 50; cp2Offset = -50;
         }
@@ -66,9 +71,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function drawAllFlows() {
-        svg.innerHTML = ''; // clear existing lines
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#58a6ff" />
+                </marker>
+                <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#3fb950" />
+                </marker>
+                <marker id="arrow-orange" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#d29922" />
+                </marker>
+            </defs>
+        `;
 
-        // Flows Definition Map
         const flows = [
             // EX0 flows (1-4)
             { type: 'ex0', id: 1, inPort: 'ex0-9', src: 'ex0-1', egress: 'ex0-11', mirror: 'ex0-10' },
@@ -85,29 +101,38 @@ document.addEventListener("DOMContentLoaded", () => {
         flows.forEach(flow => {
             const color = flow.type === 'ex0' ? '#58a6ff' : '#3fb950';
             
-            // 1. Cybernet In to InPort
-            drawRoute('cloud-in', flow.inPort, 'path-uplink', color, 'down', 0);
+            // Map 8 flows into 4 Primary/Mirror DPI servers.
+            // Flow 1,2 -> DPI 1
+            // Flow 3,4 -> DPI 2
+            // Flow 5,6 -> DPI 3
+            // Flow 7,8 -> DPI 4
+            const dpiTargetId = Math.ceil(flow.id / 2);
             
-            // 2. InPort to Source Port (Logical jumping inside switch)
-            drawRoute(flow.inPort, flow.src, 'path-logical', color, 'inner', 0);
+            // Add a visual spread offset so overlapping flows from different sequences are distinct
+            const offset = (flow.id % 2 === 0) ? 6 : -6;
+
+            // 1. Cybernet In to InPort (Inward arrow)
+            drawRoute('cloud-in', flow.inPort, 'path-uplink', color, 'down', offset);
             
-            // 3. Source Port to DPI (Uplink Physical)
-            drawRoute(flow.src, `dpi-${flow.id}`, 'path-uplink', color, 'down', -3);
+            // 2. InPort to Source Port (Logical inner wire fwd)
+            drawRoute(flow.inPort, flow.src, 'path-logical', color, 'inner', offset);
             
-            // 4. DPI to Source Port (Downlink Physical) - offset slightly to see return wire
-            drawRoute(`dpi-${flow.id}`, flow.src, 'path-return', color, 'up', 3);
+            // 3. Source Port to DPI (Uplink Physical inward to server)
+            drawRoute(flow.src, `dpi-${dpiTargetId}`, 'path-uplink', color, 'down', offset - 4);
             
-            // 5. Source Port to Egress Port (Logical inside switch)
-            drawRoute(flow.src, flow.egress, 'path-logical', color, 'inner-down', 0);
+            // 4. DPI to Source Port (Downlink Physical outward from server)
+            drawRoute(`dpi-${dpiTargetId}`, flow.src, 'path-return', color, 'up', offset + 4);
             
-            // 6. Egress to Cybernet Out
-            drawRoute(flow.egress, 'cloud-out', 'path-return', color, 'up', 0);
+            // 5. Source Port to Egress Port (Logical inner wire fwd)
+            drawRoute(flow.src, flow.egress, 'path-logical', color, 'inner-down', offset);
             
-            // 7. Mirror Port to Mirror DPI (Crosses over standard DPIs)
-            drawRoute(flow.mirror, `m-dpi-${flow.id}`, 'path-mirror', '#d29922', 'deep', 0);
+            // 6. Egress to Cybernet Out (Outward arrow)
+            drawRoute(flow.egress, 'cloud-out', 'path-return', color, 'up', offset);
+            
+            // 7. Mirror Port to Mirror DPI (Crosses over standard DPIs, inward arrow)
+            drawRoute(flow.mirror, `m-dpi-${dpiTargetId}`, 'path-mirror', '#d29922', 'deep', offset);
         });
     }
 
-    // Wait slightly for layout to settle before drawing lines
-    setTimeout(drawAllFlows, 100);
+    setTimeout(drawAllFlows, 150);
 });
