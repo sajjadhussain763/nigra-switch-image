@@ -13,9 +13,9 @@ body {
 
 #diagram-container {
     position: relative;
-    width: 1700px;
+    max-width: 1400px; /* Reduced width so it fits perfectly on laptops without horizontal cutoff */
     margin: 0 auto;
-    padding: 50px 0 350px; /* plenty of room for wide legend at bottom */
+    padding: 50px 20px 350px;
 }
 
 #connections {
@@ -46,13 +46,13 @@ body {
     position: relative;
     z-index: 2;
     margin-bottom: 120px;
-    padding: 0 150px;
+    padding: 0 50px;
 }
 
 .cloud {
     background: #111;
     border: 2px dashed #444;
-    padding: 20px 60px;
+    padding: 20px 40px;
     border-radius: 50px;
     font-weight: bold;
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
@@ -64,14 +64,15 @@ body {
     border: 1px solid #333;
     border-radius: 10px;
     padding: 20px;
-    margin: 0 50px 150px;
+    margin: 0 20px 150px;
     position: relative;
     z-index: 2;
 }
 
 .modules-container {
     display: flex;
-    gap: 30px;
+    gap: 20px;
+    justify-content: center;
 }
 
 .module {
@@ -104,7 +105,7 @@ body {
 .zone-divider {
     width: 2px;
     background: #333;
-    margin: 0 20px;
+    margin: 0 15px;
 }
 
 .zone-title {
@@ -120,7 +121,7 @@ body {
 .ports-grid-half {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 8px;
 }
 
 .port {
@@ -130,7 +131,7 @@ body {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     text-align: center;
-    padding: 10px 0;
+    padding: 8px 0;
     border-radius: 3px;
     position: relative;
 }
@@ -139,14 +140,13 @@ body {
 .servers-layer {
     position: relative;
     z-index: 2;
-    margin: 0 50px 100px;
+    margin: 0 20px 100px;
 }
 
 .server-group {
     display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 0 50px;
+    justify-content: center;
+    gap: 40px;
 }
 
 .server {
@@ -169,6 +169,16 @@ body {
     font-weight: normal;
 }
 
+/* SVG Text labels */
+.path-label {
+    paint-order: stroke;
+    stroke: #000;
+    stroke-width: 3px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    font-family: 'JetBrains Mono', monospace;
+}
+
 /* Base Legend Styles */
 .legend {
     position: fixed;
@@ -179,7 +189,7 @@ body {
     padding: 20px;
     border-radius: 5px;
     z-index: 10;
-    width: 500px;
+    width: 450px;
     box-shadow: 0 -10px 20px rgba(0,0,0,0.5);
 }
 
@@ -202,5 +212,3 @@ body {
     height: 0;
     border-top-width: 2px;
 }
-
-/* dynamic colors generated in JS */

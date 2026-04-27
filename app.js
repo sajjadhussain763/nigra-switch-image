@@ -2,16 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const svg = document.getElementById('connections');
     const legendContainer = document.getElementById('flow-legend-container');
     
-    // Unique colors for 8 different flow sets so they NEVER get confused
+    // Unique colors for 8 different flow sets
     const colorMap = {
-        1: '#ff0055', // Hot Pink
-        2: '#00d2ff', // Cyan
-        3: '#ffaa00', // Orange
-        4: '#a600ff', // Purple
-        5: '#00ff88', // Spring Green
-        6: '#ff5500', // Red Orange
-        7: '#ffff00', // Yellow
-        8: '#0055ff'  // Bright Blue
+        1: '#ff0055', 2: '#00d2ff', 3: '#ffaa00', 4: '#a600ff',
+        5: '#00ff88', 6: '#ff5500', 7: '#ffff00', 8: '#0055ff'
     };
 
     function resizeSVG() {
@@ -58,13 +52,25 @@ document.addEventListener("DOMContentLoaded", () => {
         svg.appendChild(path);
     }
 
-    function drawRoute(idStr1, idStr2, strokeStyle, color, markerId, curveType='normal', offset=0) {
+    function createTextLabel(x, y, textContent, color) {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x);
+        text.setAttribute('y', y);
+        text.setAttribute('fill', color);
+        text.setAttribute('font-size', '10px');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('class', 'path-label');
+        text.textContent = textContent;
+        svg.appendChild(text);
+    }
+
+    function drawRoute(idStr1, idStr2, strokeStyle, color, markerId, curveType='normal', offset=0, labelText='') {
         const p1 = getCenter(idStr1);
         const p2 = getCenter(idStr2);
         
         if(p1.x === 0 || p2.x === 0) return;
 
-        // Apply physical visual port offset so wires don't visually overlap perfectly in center
         p1.x += offset;
         p2.x += offset;
 
@@ -84,16 +90,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         createPath(p1.x, p1.y, p2.x, p2.y, strokeStyle, color, cp1Offset, cp2Offset, markerId);
+
+        // Render text label if provided
+        if (labelText) {
+            // we place label slightly in front of the source or target depending on direction
+            let textX = p1.x;
+            let textY = p1.y;
+            
+            if (curveType === 'down') {
+                textY = p1.y + 25; // below starting port
+            } else if (curveType === 'up') {
+                textX = p2.x; 
+                textY = p2.y + 25; // below targeted port
+            } else if (curveType === 'deep') {
+                textY = p1.y + 40; // below mirror out
+            }
+
+            createTextLabel(textX, textY, labelText, color);
+        }
     }
 
     function buildDefs() {
         let defsHtml = '<defs>';
         for(let i = 1; i <= 8; i++) {
-            defsHtml += `
-                <marker id="arrow-flow${i}" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
-                    <path d="M0,0 L8,4 L0,8 Z" fill="${colorMap[i]}" />
-                </marker>
-            `;
+            defsHtml += `<marker id="arrow-flow${i}" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto"><path d="M0,0 L8,4 L0,8 Z" fill="${colorMap[i]}" /></marker>`;
         }
         defsHtml += '</defs>';
         return defsHtml;
@@ -106,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
             div.style.display = 'flex';
             div.style.alignItems = 'center';
             div.style.gap = '8px';
-            div.innerHTML = `<div style="width:15px; height:15px; border-radius:50%; background:${colorMap[i]}"></div> <span style="color:#ccc; font-size:11px; font-weight:bold;">Flow Set ${i}</span>`;
+            div.innerHTML = `<div style="width:15px; height:15px; border-radius:50%; background:${colorMap[i]}"></div> <span style="color:#ccc; font-size:11px; font-weight:bold;">Flow ${i}</span>`;
             legendContainer.appendChild(div);
         }
     }
@@ -131,30 +151,28 @@ document.addEventListener("DOMContentLoaded", () => {
             const marker = `arrow-flow${flow.id}`;
             const dpiTargetId = Math.ceil(flow.id / 2);
             
-            // Port center offset logic to visually divide wires if entering the same node
-            // Spread the entry/exit points horizontally based on id
-            const offset = (flow.id * 4) - 18; 
+            const offset = (flow.id * 5) - 22; 
 
-            // 1. Cybernet In to Network Side Port (Inward)
-            drawRoute('cloud-in', flow.inPort, 'solid', color, marker, 'down', offset);
+            // 1. Cybernet In to Network Side Port
+            drawRoute('cloud-in', flow.inPort, 'solid', color, marker, 'down', offset, `In: ${flow.inPort}`);
             
-            // 2. Logic: Network Side Port -> Appliance Side Port (Inner switch fwd)
+            // 2. Logic: Network Side Port -> Appliance Side Port (Logic, no text)
             drawRoute(flow.inPort, flow.src, 'dotted', color, marker, 'inner', 0);
             
-            // 3. Appliance Side Port -> DPI Server (Uplink/Inward)
-            drawRoute(flow.src, `dpi-${dpiTargetId}`, 'solid', color, marker, 'down', offset - 10);
+            // 3. Appliance Side Port -> DPI Server
+            drawRoute(flow.src, `dpi-${dpiTargetId}`, 'solid', color, marker, 'down', offset - 10, `Out: ${flow.src}`);
             
-            // 4. DPI Server -> Appliance Side Port (Downlink/Outward physical return)
-            drawRoute(`dpi-${dpiTargetId}`, flow.src, 'dashed', color, marker, 'up', offset + 10);
+            // 4. DPI Server -> Appliance Side Port (Return)
+            drawRoute(`dpi-${dpiTargetId}`, flow.src, 'dashed', color, marker, 'up', offset + 10, `Rt: ${flow.src}`);
             
-            // 5. Logic: Appliance Side Port -> Egress Network side Port (Inner switch logical)
+            // 5. Logic: Appliance Side Port -> Egress Network side Port (Logic, no text)
             drawRoute(flow.src, flow.egress, 'dotted', color, marker, 'inner-down', 0);
             
-            // 6. Egress Network Side Port -> Cybernet Out (Outward)
-            drawRoute(flow.egress, 'cloud-out', 'dashed', color, marker, 'up', offset);
+            // 6. Egress Network Side Port -> Cybernet Out
+            drawRoute(flow.egress, 'cloud-out', 'dashed', color, marker, 'up', offset, `Out: ${flow.egress}`);
             
-            // 7. Mirror Port (Appliance side clone logic) to Mirror DPI (Crosses over standard DPIs)
-            drawRoute(flow.mirror, `m-dpi-${dpiTargetId}`, 'dashed', color, marker, 'deep', offset);
+            // 7. Mirror Port to Mirror DPI
+            drawRoute(flow.mirror, `m-dpi-${dpiTargetId}`, 'dashed', color, marker, 'deep', offset, `Mir: ${flow.mirror}`);
         });
     }
 
