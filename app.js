@@ -52,27 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         svg.appendChild(path);
     }
 
-    function createTextLabel(x, y, textContent, color) {
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', x);
-        text.setAttribute('y', y);
-        text.setAttribute('fill', '#ffffff'); // Bold white text
-        text.setAttribute('font-size', '13px'); // Extra large and readable
-        text.setAttribute('font-weight', 'bold');
-        text.setAttribute('text-anchor', 'middle');
-        
-        // This adds a painted border exactly matching the line color, acting as a clear visual box!
-        text.style.paintOrder = "stroke fill";
-        text.style.stroke = color;
-        text.style.strokeWidth = "5px";
-        text.style.strokeLinecap = "round";
-        text.style.strokeLinejoin = "round";
-        
-        text.textContent = textContent;
-        svg.appendChild(text);
-    }
-
-    function drawRoute(idStr1, idStr2, strokeStyle, color, markerId, curveType='normal', offset=0, labelText='') {
+    function drawRoute(idStr1, idStr2, strokeStyle, color, markerId, curveType='normal', offset=0) {
         const p1 = getCenter(idStr1);
         const p2 = getCenter(idStr2);
         
@@ -97,24 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         createPath(p1.x, p1.y, p2.x, p2.y, strokeStyle, color, cp1Offset, cp2Offset, markerId);
-
-        // Render port number on the wire!
-        if (labelText) {
-            let textX = p1.x;
-            let textY = p1.y;
-            
-            // Push it far enough down the wire so it fully clears the HTML port box bounds
-            if (curveType === 'down') {
-                textY = p1.y + 60; 
-            } else if (curveType === 'up') {
-                textX = p2.x; 
-                textY = p2.y + 60; 
-            } else if (curveType === 'deep') {
-                textY = p1.y + 90; 
-            }
-
-            createTextLabel(textX, textY, labelText, color);
-        }
     }
 
     function buildDefs() {
@@ -160,26 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const offset = (flow.id * 5) - 22; 
 
-            // 1. Cybernet In to Network Side Port
-            drawRoute('cloud-in', flow.inPort, 'solid', color, marker, 'down', offset, `In: ${flow.inPort}`);
-            
-            // 2. Logic: Network Side Port -> Appliance Side Port
+            drawRoute('cloud-in', flow.inPort, 'solid', color, marker, 'down', offset);
             drawRoute(flow.inPort, flow.src, 'dotted', color, marker, 'inner', 0);
-            
-            // 3. Appliance Side Port -> DPI Server
-            drawRoute(flow.src, `dpi-${dpiTargetId}`, 'solid', color, marker, 'down', offset - 10, `Out: ${flow.src}`);
-            
-            // 4. DPI Server -> Appliance Side Port (Return)
-            drawRoute(`dpi-${dpiTargetId}`, flow.src, 'dashed', color, marker, 'up', offset + 10, `Ret: ${flow.src}`);
-            
-            // 5. Logic: Appliance Side Port -> Egress Network side Port
+            drawRoute(flow.src, `dpi-${dpiTargetId}`, 'solid', color, marker, 'down', offset - 10);
+            drawRoute(`dpi-${dpiTargetId}`, flow.src, 'dashed', color, marker, 'up', offset + 10);
             drawRoute(flow.src, flow.egress, 'dotted', color, marker, 'inner-down', 0);
-            
-            // 6. Egress Network Side Port -> Cybernet Out
-            drawRoute(flow.egress, 'cloud-out', 'dashed', color, marker, 'up', offset, `Out: ${flow.egress}`);
-            
-            // 7. Mirror Port to Mirror DPI
-            drawRoute(flow.mirror, `m-dpi-${dpiTargetId}`, 'dashed', color, marker, 'deep', offset, `Mir: ${flow.mirror}`);
+            drawRoute(flow.egress, 'cloud-out', 'dashed', color, marker, 'up', offset);
+            drawRoute(flow.mirror, `m-dpi-${dpiTargetId}`, 'dashed', color, marker, 'deep', offset);
         });
     }
 
