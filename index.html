@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niagara Single Page Unified Diagram</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="diagram-container">
+        <svg id="connections" preserveAspectRatio="none"></svg>
+
+        <div class="top-clouds">
+            <div class="cloud" id="cloud-in">Cybernet Network IN</div>
+            <div class="cloud" id="cloud-out">Cybernet Network OUT</div>
+        </div>
+
+        <div class="switch-rack">
+            <div class="rack-title">Niagara Network Packet Broker</div>
+            <div class="modules-container">
+                <!-- EX0 Module -->
+                <div class="module ex0-card">
+                    <div class="module-title">EX0 MODULE</div>
+                    <div class="ports-grid">
+                        <div class="port" id="ex0-1">0/1</div>
+                        <div class="port" id="ex0-3">0/3</div>
+                        <div class="port" id="ex0-5">0/5</div>
+                        <div class="port" id="ex0-7">0/7</div>
+                        <div class="port" id="ex0-9">0/9</div>
+                        <div class="port" id="ex0-11">0/11</div>
+                        <div class="port" id="ex0-13">0/13</div>
+                        <div class="port" id="ex0-15">0/15</div>
+                        <div class="port" id="ex0-2">0/2</div>
+                        <div class="port" id="ex0-4">0/4</div>
+                        <div class="port" id="ex0-6">0/6</div>
+                        <div class="port" id="ex0-8">0/8</div>
+                        <div class="port" id="ex0-10">0/10</div>
+                        <div class="port" id="ex0-12">0/12</div>
+                        <div class="port" id="ex0-14">0/14</div>
+                        <div class="port" id="ex0-16">0/16</div>
+                    </div>
+                </div>
+
+                <!-- EX2 Module -->
+                <div class="module ex2-card">
+                    <div class="module-title">EX2 MODULE</div>
+                    <div class="ports-grid">
+                        <div class="port" id="ex2-1">2/1</div>
+                        <div class="port" id="ex2-3">2/3</div>
+                        <div class="port" id="ex2-5">2/5</div>
+                        <div class="port" id="ex2-7">2/7</div>
+                        <div class="port" id="ex2-9">2/9</div>
+                        <div class="port" id="ex2-11">2/11</div>
+                        <div class="port" id="ex2-13">2/13</div>
+                        <div class="port" id="ex2-15">2/15</div>
+                        <div class="port" id="ex2-2">2/2</div>
+                        <div class="port" id="ex2-4">2/4</div>
+                        <div class="port" id="ex2-6">2/6</div>
+                        <div class="port" id="ex2-8">2/8</div>
+                        <div class="port" id="ex2-10">2/10</div>
+                        <div class="port" id="ex2-12">2/12</div>
+                        <div class="port" id="ex2-14">2/14</div>
+                        <div class="port" id="ex2-16">2/16</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="servers-layer dpi-layer">
+            <div class="layer-title">Inline DPI Servers</div>
+            <div class="server-group">
+                <div class="server dpi" id="dpi-1">DPI-1</div>
+                <div class="server dpi" id="dpi-2">DPI-2</div>
+                <div class="server dpi" id="dpi-3">DPI-3</div>
+                <div class="server dpi" id="dpi-4">DPI-4</div>
+                <div class="server dpi" id="dpi-5">DPI-5</div>
+                <div class="server dpi" id="dpi-6">DPI-6</div>
+                <div class="server dpi" id="dpi-7">DPI-7</div>
+                <div class="server dpi" id="dpi-8">DPI-8</div>
+            </div>
+        </div>
+
+        <div class="servers-layer mirror-layer">
+            <div class="layer-title">Lawful Intercept / Mirror Servers</div>
+            <div class="server-group">
+                <div class="server mirror" id="m-dpi-1">M-DPI-1</div>
+                <div class="server mirror" id="m-dpi-2">M-DPI-2</div>
+                <div class="server mirror" id="m-dpi-3">M-DPI-3</div>
+                <div class="server mirror" id="m-dpi-4">M-DPI-4</div>
+                <div class="server mirror" id="m-dpi-5">M-DPI-5</div>
+                <div class="server mirror" id="m-dpi-6">M-DPI-6</div>
+                <div class="server mirror" id="m-dpi-7">M-DPI-7</div>
+                <div class="server mirror" id="m-dpi-8">M-DPI-8</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="legend" id="legend">
+        <h3>Routing Legend</h3>
+        <div class="leg-item"><div class="line blue" style="border-top-style: solid;"></div> Ex0 Physical Uplink</div>
+        <div class="leg-item"><div class="line blue" style="border-top-style: dotted;"></div> Ex0 Inner Logical Switch</div>
+        <div class="leg-item"><div class="line blue" style="border-top-style: dashed;"></div> Ex0 Physical Return</div>
+        <div class="leg-item"><div class="line green" style="border-top-style: solid;"></div> Ex2 Physical Uplink</div>
+        <div class="leg-item"><div class="line green" style="border-top-style: dotted;"></div> Ex2 Inner Logical Switch</div>
+        <div class="leg-item"><div class="line green" style="border-top-style: dashed;"></div> Ex2 Physical Return</div>
+        <div class="leg-item"><div class="line orange" style="border-top-style: dashed;"></div> Mirror Clone Data</div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
