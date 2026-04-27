@@ -1,6 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
     const svg = document.getElementById('connections');
+    const legendContainer = document.getElementById('flow-legend-container');
     
+    // Unique colors for 8 different flow sets so they NEVER get confused
+    const colorMap = {
+        1: '#ff0055', // Hot Pink
+        2: '#00d2ff', // Cyan
+        3: '#ffaa00', // Orange
+        4: '#a600ff', // Purple
+        5: '#00ff88', // Spring Green
+        6: '#ff5500', // Red Orange
+        7: '#ffff00', // Yellow
+        8: '#0055ff'  // Bright Blue
+    };
+
     function resizeSVG() {
         const container = document.getElementById('diagram-container');
         svg.setAttribute('width', container.offsetWidth);
@@ -25,114 +38,125 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    function createPath(startX, startY, endX, endY, classes, color, cp1yOffset, cp2yOffset) {
+    function createPath(startX, startY, endX, endY, strokeStyle, color, cp1yOffset, cp2yOffset, markerId) {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const d = `M ${startX} ${startY} C ${startX} ${startY + cp1yOffset}, ${endX} ${endY + cp2yOffset}, ${endX} ${endY}`;
         path.setAttribute('d', d);
-        path.setAttribute('class', classes);
         path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', '2.5');
+        path.setAttribute('fill', 'none');
         
-        // Add directional arrows
-        let markerId = '';
-        if(color === '#58a6ff') markerId = 'url(#arrow-blue)';
-        if(color === '#3fb950') markerId = 'url(#arrow-green)';
-        if(color === '#d29922') markerId = 'url(#arrow-orange)';
-        
-        path.setAttribute('marker-end', markerId);
-        
+        if (strokeStyle === 'dashed') {
+            path.setAttribute('stroke-dasharray', '8, 6');
+            path.setAttribute('opacity', '0.8');
+        } else if (strokeStyle === 'dotted') {
+            path.setAttribute('stroke-dasharray', '3, 4');
+            path.setAttribute('opacity', '0.6');
+        }
+
+        path.setAttribute('marker-end', `url(#${markerId})`);
         svg.appendChild(path);
     }
 
-    function drawRoute(idStr1, idStr2, classes, color, curveType='normal', offset=0) {
+    function drawRoute(idStr1, idStr2, strokeStyle, color, markerId, curveType='normal', offset=0) {
         const p1 = getCenter(idStr1);
         const p2 = getCenter(idStr2);
         
         if(p1.x === 0 || p2.x === 0) return;
 
+        // Apply physical visual port offset so wires don't visually overlap perfectly in center
         p1.x += offset;
         p2.x += offset;
 
         let cp1Offset, cp2Offset;
         if (curveType === 'down') {
-            cp1Offset = 100; cp2Offset = -100;
+            cp1Offset = 180; cp2Offset = -150;
         } else if (curveType === 'up') {
-            cp1Offset = -100; cp2Offset = 100;
+            cp1Offset = -180; cp2Offset = 150;
         } else if (curveType === 'inner') {
-            cp1Offset = -25; cp2Offset = -25;
+            cp1Offset = -40; cp2Offset = -40;
         } else if (curveType === 'inner-down') {
-            cp1Offset = 25; cp2Offset = 25;
+            cp1Offset = 40; cp2Offset = 40;
         } else if (curveType === 'deep') {
-            cp1Offset = 200; cp2Offset = -200;
+            cp1Offset = 250; cp2Offset = -250;
         } else {
             cp1Offset = 50; cp2Offset = -50;
         }
 
-        createPath(p1.x, p1.y, p2.x, p2.y, classes, color, cp1Offset, cp2Offset);
+        createPath(p1.x, p1.y, p2.x, p2.y, strokeStyle, color, cp1Offset, cp2Offset, markerId);
+    }
+
+    function buildDefs() {
+        let defsHtml = '<defs>';
+        for(let i = 1; i <= 8; i++) {
+            defsHtml += `
+                <marker id="arrow-flow${i}" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="${colorMap[i]}" />
+                </marker>
+            `;
+        }
+        defsHtml += '</defs>';
+        return defsHtml;
+    }
+
+    function buildLegend() {
+        legendContainer.innerHTML = '';
+        for (let i = 1; i <= 8; i++) {
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '8px';
+            div.innerHTML = `<div style="width:15px; height:15px; border-radius:50%; background:${colorMap[i]}"></div> <span style="color:#ccc; font-size:11px; font-weight:bold;">Flow Set ${i}</span>`;
+            legendContainer.appendChild(div);
+        }
     }
 
     function drawAllFlows() {
-        svg.innerHTML = `
-            <defs>
-                <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
-                    <path d="M0,0 L8,4 L0,8 Z" fill="#58a6ff" />
-                </marker>
-                <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
-                    <path d="M0,0 L8,4 L0,8 Z" fill="#3fb950" />
-                </marker>
-                <marker id="arrow-orange" markerWidth="8" markerHeight="8" refX="7" refY="4" orientation="auto">
-                    <path d="M0,0 L8,4 L0,8 Z" fill="#d29922" />
-                </marker>
-            </defs>
-        `;
+        svg.innerHTML = buildDefs();
+        buildLegend();
 
         const flows = [
-            // EX0 flows (1-4)
-            { type: 'ex0', id: 1, inPort: 'ex0-9', src: 'ex0-1', egress: 'ex0-11', mirror: 'ex0-10' },
-            { type: 'ex0', id: 2, inPort: 'ex0-11', src: 'ex0-3', egress: 'ex0-9', mirror: 'ex0-12' },
-            { type: 'ex0', id: 3, inPort: 'ex0-13', src: 'ex0-7', egress: 'ex0-15', mirror: 'ex0-14' },
-            { type: 'ex0', id: 4, inPort: 'ex0-15', src: 'ex0-5', egress: 'ex0-13', mirror: 'ex0-16' },
-            // EX2 flows (5-8)
-            { type: 'ex2', id: 5, inPort: 'ex2-10', src: 'ex2-2', egress: 'ex2-12', mirror: 'ex2-8' },
-            { type: 'ex2', id: 6, inPort: 'ex2-12', src: 'ex2-4', egress: 'ex2-10', mirror: 'ex2-6' },
-            { type: 'ex2', id: 7, inPort: 'ex2-13', src: 'ex2-5', egress: 'ex2-15', mirror: 'ex2-14' },
-            { type: 'ex2', id: 8, inPort: 'ex2-15', src: 'ex2-7', egress: 'ex2-13', mirror: 'ex2-16' }
+            { id: 1, inPort: 'ex0-9', src: 'ex0-1', egress: 'ex0-11', mirror: 'ex0-10' },
+            { id: 2, inPort: 'ex0-11', src: 'ex0-3', egress: 'ex0-9', mirror: 'ex0-12' },
+            { id: 3, inPort: 'ex0-13', src: 'ex0-7', egress: 'ex0-15', mirror: 'ex0-14' },
+            { id: 4, inPort: 'ex0-15', src: 'ex0-5', egress: 'ex0-13', mirror: 'ex0-16' },
+            { id: 5, inPort: 'ex2-10', src: 'ex2-2', egress: 'ex2-12', mirror: 'ex2-8' },
+            { id: 6, inPort: 'ex2-12', src: 'ex2-4', egress: 'ex2-10', mirror: 'ex2-6' },
+            { id: 7, inPort: 'ex2-13', src: 'ex2-5', egress: 'ex2-15', mirror: 'ex2-14' },
+            { id: 8, inPort: 'ex2-15', src: 'ex2-7', egress: 'ex2-13', mirror: 'ex2-16' }
         ];
 
         flows.forEach(flow => {
-            const color = flow.type === 'ex0' ? '#58a6ff' : '#3fb950';
-            
-            // Map 8 flows into 4 Primary/Mirror DPI servers.
-            // Flow 1,2 -> DPI 1
-            // Flow 3,4 -> DPI 2
-            // Flow 5,6 -> DPI 3
-            // Flow 7,8 -> DPI 4
+            const color = colorMap[flow.id];
+            const marker = `arrow-flow${flow.id}`;
             const dpiTargetId = Math.ceil(flow.id / 2);
             
-            // Add a visual spread offset so overlapping flows from different sequences are distinct
-            const offset = (flow.id % 2 === 0) ? 6 : -6;
+            // Port center offset logic to visually divide wires if entering the same node
+            // Spread the entry/exit points horizontally based on id
+            const offset = (flow.id * 4) - 18; 
 
-            // 1. Cybernet In to InPort (Inward arrow)
-            drawRoute('cloud-in', flow.inPort, 'path-uplink', color, 'down', offset);
+            // 1. Cybernet In to Network Side Port (Inward)
+            drawRoute('cloud-in', flow.inPort, 'solid', color, marker, 'down', offset);
             
-            // 2. InPort to Source Port (Logical inner wire fwd)
-            drawRoute(flow.inPort, flow.src, 'path-logical', color, 'inner', offset);
+            // 2. Logic: Network Side Port -> Appliance Side Port (Inner switch fwd)
+            drawRoute(flow.inPort, flow.src, 'dotted', color, marker, 'inner', 0);
             
-            // 3. Source Port to DPI (Uplink Physical inward to server)
-            drawRoute(flow.src, `dpi-${dpiTargetId}`, 'path-uplink', color, 'down', offset - 4);
+            // 3. Appliance Side Port -> DPI Server (Uplink/Inward)
+            drawRoute(flow.src, `dpi-${dpiTargetId}`, 'solid', color, marker, 'down', offset - 10);
             
-            // 4. DPI to Source Port (Downlink Physical outward from server)
-            drawRoute(`dpi-${dpiTargetId}`, flow.src, 'path-return', color, 'up', offset + 4);
+            // 4. DPI Server -> Appliance Side Port (Downlink/Outward physical return)
+            drawRoute(`dpi-${dpiTargetId}`, flow.src, 'dashed', color, marker, 'up', offset + 10);
             
-            // 5. Source Port to Egress Port (Logical inner wire fwd)
-            drawRoute(flow.src, flow.egress, 'path-logical', color, 'inner-down', offset);
+            // 5. Logic: Appliance Side Port -> Egress Network side Port (Inner switch logical)
+            drawRoute(flow.src, flow.egress, 'dotted', color, marker, 'inner-down', 0);
             
-            // 6. Egress to Cybernet Out (Outward arrow)
-            drawRoute(flow.egress, 'cloud-out', 'path-return', color, 'up', offset);
+            // 6. Egress Network Side Port -> Cybernet Out (Outward)
+            drawRoute(flow.egress, 'cloud-out', 'dashed', color, marker, 'up', offset);
             
-            // 7. Mirror Port to Mirror DPI (Crosses over standard DPIs, inward arrow)
-            drawRoute(flow.mirror, `m-dpi-${dpiTargetId}`, 'path-mirror', '#d29922', 'deep', offset);
+            // 7. Mirror Port (Appliance side clone logic) to Mirror DPI (Crosses over standard DPIs)
+            drawRoute(flow.mirror, `m-dpi-${dpiTargetId}`, 'dashed', color, marker, 'deep', offset);
         });
     }
 
-    setTimeout(drawAllFlows, 150);
+    setTimeout(drawAllFlows, 300);
 });
