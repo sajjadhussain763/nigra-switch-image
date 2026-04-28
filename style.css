@@ -16,6 +16,7 @@ body {
     max-width: 1400px; /* Reduced width so it fits perfectly on laptops without horizontal cutoff */
     margin: 0 auto;
     padding: 50px 20px 350px;
+    min-height: 1200px;
 }
 
 #connections {

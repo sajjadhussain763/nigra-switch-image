@@ -168,6 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // 7. Mirror Port  →  Mirror DPI Server
             drawRoute(flow.mirror,          `m-dpi-${dpi}`, 'dashed', color, marker, 'deep', off);
         });
+    }
+
 // ── Download Feature ──────────────────────────────────────────────────
 const downloadPngBtn = document.getElementById('download-png');
 const downloadJpgBtn = document.getElementById('download-jpg');
