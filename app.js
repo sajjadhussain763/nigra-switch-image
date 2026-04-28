@@ -170,5 +170,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // ── Download Feature ──────────────────────────────────────────────────
+    const downloadBtn = document.getElementById('download-btn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            // Hide the button during capture
+            downloadBtn.style.display = 'none';
+
+            const container = document.getElementById('diagram-container');
+            
+            // html2canvas capture
+            html2canvas(container, {
+                backgroundColor: "#ffffff",
+                scale: 2, // Higher quality
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'NIAGARA_SWITCH_11_Diagram.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Restore the button
+                downloadBtn.style.display = 'flex';
+            });
+        });
+    }
+
     setTimeout(drawAllFlows, 350);
 });

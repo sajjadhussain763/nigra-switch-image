@@ -237,3 +237,34 @@ body {
     height: 0;
     border-top-width: 2px;
 }
+
+#download-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #0055ff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 85, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+#download-btn:hover {
+    background: #0044cc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 85, 255, 0.4);
+}
+
+#download-btn:active {
+    transform: translateY(0);
+}
