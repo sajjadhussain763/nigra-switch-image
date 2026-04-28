@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Niagara Switch 8-Flow Unique Colors Diagram</title>
+    <title>Niagara Switch 8-Flow Diagram</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,10 +11,9 @@
 </head>
 <body>
     <div id="diagram-container">
-        <!-- SVG Canvas for drawing paths -->
-        <svg id="connections" preserveAspectRatio="none">
-            <!-- Markers generated dynamically via JS to match the 8 unique flow colors -->
-        </svg>
+        <svg id="connections" preserveAspectRatio="none"></svg>
+
+        <div class="main-title">NIAGARA SWITCH_11</div>
 
         <div class="top-clouds">
             <div class="cloud" id="cloud-in">Cybernet Network IN</div>
@@ -22,7 +21,6 @@
         </div>
 
         <div class="switch-rack">
-            <div class="rack-title">Niagara Network Packet Broker</div>
             <div class="modules-container">
                 <!-- EX0 Module -->
                 <div class="module ex0-card">
@@ -98,40 +96,51 @@
             </div>
         </div>
 
+        <!-- Servers Layer uses identical flex column layout so DPIs align strictly beneath their module! -->
         <div class="servers-layer dpi-layer">
             <div class="layer-title">Inline DPI Servers (2 Flow Sets / DPI)</div>
-            <div class="server-group">
-                <div class="server dpi" id="dpi-1">DPI-1<br><small>(Flow 1 & 2)</small></div>
-                <div class="server dpi" id="dpi-2">DPI-2<br><small>(Flow 3 & 4)</small></div>
-                <div class="server dpi" id="dpi-3">DPI-3<br><small>(Flow 5 & 6)</small></div>
-                <div class="server dpi" id="dpi-4">DPI-4<br><small>(Flow 7 & 8)</small></div>
+            <div class="server-groups-wrapper">
+                <div class="server-subgroup">
+                    <div class="server dpi" id="dpi-1">DPI-1</div>
+                    <div class="server dpi" id="dpi-2">DPI-2</div>
+                </div>
+                <!-- Alignment gap directly mimics the 20px gap inside switch-rack -->
+                <div style="width: 20px;"></div>
+                <div class="server-subgroup">
+                    <div class="server dpi" id="dpi-3">DPI-3</div>
+                    <div class="server dpi" id="dpi-4">DPI-4</div>
+                </div>
             </div>
         </div>
 
         <div class="servers-layer mirror-layer">
-            <div class="layer-title">Lawful Intercept / Mirror Servers</div>
-            <div class="server-group">
-                <div class="server mirror" id="m-dpi-1">M-DPI-1<br><small>(Flow 1 & 2 Clones)</small></div>
-                <div class="server mirror" id="m-dpi-2">M-DPI-2<br><small>(Flow 3 & 4 Clones)</small></div>
-                <div class="server mirror" id="m-dpi-3">M-DPI-3<br><small>(Flow 5 & 6 Clones)</small></div>
-                <div class="server mirror" id="m-dpi-4">M-DPI-4<br><small>(Flow 7 & 8 Clones)</small></div>
+            <div class="layer-title">Mirror Servers</div>
+            <div class="server-groups-wrapper">
+                <div class="server-subgroup">
+                    <div class="server mirror" id="m-dpi-1">Mirror Server 1</div>
+                    <div class="server mirror" id="m-dpi-2">Mirror Server 2</div>
+                </div>
+                <div style="width: 20px;"></div>
+                <div class="server-subgroup">
+                    <div class="server mirror" id="m-dpi-3">Mirror Server 3</div>
+                    <div class="server mirror" id="m-dpi-4">Mirror Server 4</div>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- Legend is now dynamic based on flow colors -->
     <div class="legend" id="legend">
         <h3>8-Flow Interactive Legend</h3>
-        <small style="color:#8b949e; display:block; margin-bottom:10px;">Unique Colors for Each Route. Arrows indicate direction.</small>
+        <small style="color:#666; display:block; margin-bottom:10px;">Unique Colors for Each Route. Arrows indicate direction.</small>
         
         <div id="flow-legend-container" style="display: flex; gap: 40px; flex-wrap: wrap;">
             <!-- Rendered by JS -->
         </div>
 
-        <h4 style="margin-top:15px; font-size:12px; border-top:1px solid #333; padding-top:10px;">Path Styles</h4>
-        <div class="leg-item"><div class="line" style="border-top: 2px solid white;"></div> <span style="font-size:11px;">Physical Uplink</span></div>
-        <div class="leg-item"><div class="line" style="border-top: 2px dotted white;"></div> <span style="font-size:11px;">Inner Switch FWD</span></div>
-        <div class="leg-item"><div class="line" style="border-top: 2px dashed rgba(255,255,255,0.5);"></div> <span style="font-size:11px;">Physical Return/Mirror</span></div>
+        <h4 style="margin-top:15px; font-size:12px; border-top:1px solid #ccc; padding-top:10px; color:#333;">Path Styles</h4>
+        <div class="leg-item"><div class="line" style="border-top: 2px solid #333;"></div> <span style="font-size:11px;">Physical Uplink</span></div>
+        <div class="leg-item"><div class="line" style="border-top: 2px dotted #333;"></div> <span style="font-size:11px;">Inner Switch FWD</span></div>
+        <div class="leg-item"><div class="line" style="border-top: 2px dashed rgba(0,0,0,0.5);"></div> <span style="font-size:11px;">Physical Return/Mirror</span></div>
     </div>
 
     <script src="app.js"></script>
