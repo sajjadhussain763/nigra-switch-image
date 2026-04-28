@@ -168,34 +168,46 @@ document.addEventListener("DOMContentLoaded", () => {
             // 7. Mirror Port  →  Mirror DPI Server
             drawRoute(flow.mirror,          `m-dpi-${dpi}`, 'dashed', color, marker, 'deep', off);
         });
-    }
+// ── Download Feature ──────────────────────────────────────────────────
+const downloadPngBtn = document.getElementById('download-png');
+const downloadJpgBtn = document.getElementById('download-jpg');
+const downloadPdfBtn = document.getElementById('download-pdf');
 
-    // ── Download Feature ──────────────────────────────────────────────────
-    const downloadBtn = document.getElementById('download-btn');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-            // Hide the button during capture
-            downloadBtn.style.display = 'none';
+function captureAndDownload(fileName, mimeType, extension) {
+    // Hide all download buttons during capture
+    [downloadPngBtn, downloadJpgBtn, downloadPdfBtn].forEach(btn => btn && (btn.style.display = 'none'));
+    const container = document.getElementById('diagram-container');
+    html2canvas(container, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        logging: false,
+        useCORS: true
+    }).then(canvas => {
+        if (extension === 'pdf') {
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: [canvas.width, canvas.height] });
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.save(fileName + '.pdf');
+        } else {
+            const link = document.createElement('a');
+            link.download = fileName + '.' + extension;
+            link.href = canvas.toDataURL(mimeType);
+            link.click();
+        }
+        // Restore button visibility
+        [downloadPngBtn, downloadJpgBtn, downloadPdfBtn].forEach(btn => btn && (btn.style.display = 'inline-block'));
+    }).catch(err => console.error('Capture failed', err));
+}
 
-            const container = document.getElementById('diagram-container');
-            
-            // html2canvas capture
-            html2canvas(container, {
-                backgroundColor: "#ffffff",
-                scale: 2, // Higher quality
-                logging: false,
-                useCORS: true
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'NIAGARA_SWITCH_11_Diagram.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                // Restore the button
-                downloadBtn.style.display = 'flex';
-            });
-        });
-    }
-
+if (downloadPngBtn) {
+    downloadPngBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_11_Diagram', 'image/png', 'png'));
+}
+if (downloadJpgBtn) {
+    downloadJpgBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_11_Diagram', 'image/jpeg', 'jpg'));
+}
+if (downloadPdfBtn) {
+    downloadPdfBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_11_Diagram', null, 'pdf'));
+}
     setTimeout(drawAllFlows, 350);
 });

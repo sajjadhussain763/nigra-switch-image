@@ -238,6 +238,7 @@ body {
     border-top-width: 2px;
 }
 
+/*
 #download-btn {
     position: fixed;
     top: 20px;
@@ -267,4 +268,32 @@ body {
 
 #download-btn:active {
     transform: translateY(0);
+}
+*/
+
+.btn-group {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+}
+
+.download-btn-modern {
+    background: #0055ff;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 85, 255, 0.2);
+    transition: background 0.2s;
+}
+
+.download-btn-modern:hover {
+    background: #0044cc;
 }

@@ -11,11 +11,12 @@
 </head>
 <body>
     <div id="diagram-container">
-        <!-- Floating Download Button -->
-        <button id="download-btn" title="Download as Image">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Save as Image
-        </button>
+        <!-- Floating Download Buttons -->
+        <div class="btn-group">
+            <button id="download-png" class="download-btn-modern" title="Download as PNG">Save as PNG</button>
+            <button id="download-jpg" class="download-btn-modern" title="Download as JPG">Save as JPG</button>
+            <button id="download-pdf" class="download-btn-modern" title="Download as PDF">Save as PDF</button>
+        </div>
 
         <svg id="connections" preserveAspectRatio="none"></svg>
 
@@ -102,15 +103,13 @@
             </div>
         </div>
 
-        <!-- Servers Layer uses identical flex column layout so DPIs align strictly beneath their module! -->
         <div class="servers-layer dpi-layer">
-            <div class="layer-title">Inline DPI Servers (2 Flow Sets / DPI)</div>
+            <div class="layer-title">DPI SERVERS</div>
             <div class="server-groups-wrapper">
                 <div class="server-subgroup">
                     <div class="server dpi" id="dpi-1">DPI-1</div>
                     <div class="server dpi" id="dpi-2">DPI-2</div>
                 </div>
-                <!-- Alignment gap directly mimics the 20px gap inside switch-rack -->
                 <div style="width: 20px;"></div>
                 <div class="server-subgroup">
                     <div class="server dpi" id="dpi-3">DPI-3</div>
@@ -150,6 +149,7 @@
     </div>
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
