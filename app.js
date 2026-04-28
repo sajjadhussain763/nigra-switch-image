@@ -133,11 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
          */
         const flows = [
             // EX0 Pair 1 (DPI-1)
-            { id: 1, inPort: 'ex0-9',  src: 'ex0-1', egress: 'ex0-11', mirror: 'ex0-10' },
-            { id: 2, inPort: 'ex0-11', src: 'ex0-1', egress: 'ex0-9',  mirror: 'ex0-12' },
+            { id: 1, inPort: 'ex0-9',  src: 'ex0-3', egress: 'ex0-11', mirror: 'ex0-10' },
+            { id: 2, inPort: 'ex0-11', src: 'ex0-3', egress: 'ex0-9',  mirror: 'ex0-12' },
             // EX0 Pair 2 (DPI-2)
-            { id: 3, inPort: 'ex0-13', src: 'ex0-3', egress: 'ex0-15', mirror: 'ex0-14' },
-            { id: 4, inPort: 'ex0-15', src: 'ex0-3', egress: 'ex0-13', mirror: 'ex0-16' },
+            { id: 3, inPort: 'ex0-13', src: 'ex0-7', egress: 'ex0-15', mirror: 'ex0-14' },
+            { id: 4, inPort: 'ex0-15', src: 'ex0-5', egress: 'ex0-13', mirror: 'ex0-16' },
             // EX2 Pair 3 (DPI-3)
             { id: 5, inPort: 'ex2-10', src: 'ex2-8', egress: 'ex2-12', mirror: 'ex2-2'  },
             { id: 6, inPort: 'ex2-12', src: 'ex2-6', egress: 'ex2-10', mirror: 'ex2-4'  },
