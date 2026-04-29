@@ -156,14 +156,14 @@ body {
 .servers-layer {
     position: relative;
     z-index: 2;
-    margin: 0 20px 120px;
+    margin: 0 20px 100px;
 }
 
 .server-groups-wrapper {
     display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 0 80px;
+    justify-content: center;
+    gap: 0;
+    padding: 0 40px;
 }
 
 .server-subgroup {

@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function drawPath(x1, y1, x2, y2, style, color, cp1y, cp2y, markerId, labelText) {
+    function drawPath(x1, y1, x2, y2, style, color, cp1y, cp2y, markerId) {
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${y1 + cp1y}, ${x2} ${y2 + cp2y}, ${x2} ${y2}`);
         path.setAttribute('stroke', color);
@@ -58,25 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         path.setAttribute('marker-end', `url(#${markerId})`);
         svg.appendChild(path);
-
-        if (labelText) {
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            // Basic midpoint estimation for the curve
-            const mx = (x1 + x2) / 2;
-            const my = (y1 + y2 + cp1y + cp2y) / 2;
-            
-            text.setAttribute('x', mx + 5);
-            text.setAttribute('y', my);
-            text.setAttribute('fill', color);
-            text.setAttribute('font-size', '9px');
-            text.setAttribute('font-weight', 'bold');
-            text.setAttribute('class', 'path-label');
-            text.textContent = labelText;
-            svg.appendChild(text);
-        }
     }
 
-    function drawRoute(fromId, toId, style, color, markerId, curve = 'down', xOffset = 0, labelText = '') {
+    function drawRoute(fromId, toId, style, color, markerId, curve = 'down', xOffset = 0) {
         let fromSide, toSide;
         switch (curve) {
             case 'down':       fromSide = 'bottom'; toSide = 'top';    break;
@@ -107,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
             default:           cp1 =   60; cp2 =  -60; break;
         }
 
-        drawPath(x1, y1, x2, y2, style, color, cp1, cp2, markerId, labelText);
+        drawPath(x1, y1, x2, y2, style, color, cp1, cp2, markerId);
     }
 
     function buildDefs() {
@@ -170,19 +154,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const off = (flow.id - 4.5) * 6;
 
             // 1. Cybernet IN  →  Network Port
-            drawRoute('cloud-in',           flow.inPort, 'solid',  color, marker, 'down', off, 'IN');
+            drawRoute('cloud-in',           flow.inPort, 'solid',  color, marker, 'down', off);
             // 2. Network Port  →  Appliance Port (Inner)
             drawRoute(flow.inPort,          flow.src,    'dotted', color, marker, 'inner',      0);
             // 3. Appliance Port  →  DPI Server
-            drawRoute(flow.src,             `dpi-${dpi}`,'solid',  color, marker, 'down', off - 8, 'Uplink');
+            drawRoute(flow.src,             `dpi-${dpi}`,'solid',  color, marker, 'down', off - 8);
             // 4. DPI Server  →  Appliance Port
-            drawRoute(`dpi-${dpi}`,         flow.src,    'dashed', color, marker, 'up',   off + 8, 'Downlink');
+            drawRoute(`dpi-${dpi}`,         flow.src,    'dashed', color, marker, 'up',   off + 8);
             // 5. Appliance Port  →  Egress Port (Inner)
             drawRoute(flow.src,             flow.egress, 'dotted', color, marker, 'inner-down', 0);
             // 6. Egress Port  →  Cybernet OUT
-            drawRoute(flow.egress,          'cloud-out', 'dashed', color, marker, 'up',   off, 'OUT');
+            drawRoute(flow.egress,          'cloud-out', 'dashed', color, marker, 'up',   off);
             // 7. Mirror Port  →  Mirror DPI Server
-            drawRoute(flow.mirror,          `m-dpi-${dpi}`, 'dashed', color, marker, 'deep', off, 'Mirror');
+            drawRoute(flow.mirror,          `m-dpi-${dpi}`, 'dashed', color, marker, 'deep', off);
         });
     }
 
@@ -219,13 +203,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (downloadPngBtn) {
-        downloadPngBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_12_Diagram', 'image/png', 'png'));
+        downloadPngBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_11_Diagram', 'image/png', 'png'));
     }
     if (downloadJpgBtn) {
-        downloadJpgBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_12_Diagram', 'image/jpeg', 'jpg'));
+        downloadJpgBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_11_Diagram', 'image/jpeg', 'jpg'));
     }
     if (downloadPdfBtn) {
-        downloadPdfBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_12_Diagram', null, 'pdf'));
+        downloadPdfBtn.addEventListener('click', () => captureAndDownload('NIAGARA_SWITCH_11_Diagram', null, 'pdf'));
     }
 
     setTimeout(drawAllFlows, 350);
