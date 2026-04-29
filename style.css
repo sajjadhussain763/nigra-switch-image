@@ -156,14 +156,14 @@ body {
 .servers-layer {
     position: relative;
     z-index: 2;
-    margin: 0 20px 100px;
+    margin: 0 20px 120px;
 }
 
 .server-groups-wrapper {
     display: flex;
-    justify-content: center;
-    gap: 0;
-    padding: 0 40px;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 80px;
 }
 
 .server-subgroup {
@@ -185,7 +185,43 @@ body {
     min-width: 140px;
     line-height: 1.4;
     color: #1a1a2e;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border-width: 2px;
+}
+
+.server.dpi {
+    background: #f1f4f9;
+    border-color: #a5b4cc;
+}
+
+.server.mirror {
+    background: #fff5eb;
+    border-color: #ffd8b1;
+}
+
+.server-icon {
+    width: 32px;
+    height: 18px;
+    background: #bdc3c7;
+    border: 2px solid #95a5a6;
+    border-radius: 2px;
+    position: relative;
+}
+
+.server-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 3px;
+    background: #7f8c8d;
+    border-radius: 1px;
 }
 
 .server small {
